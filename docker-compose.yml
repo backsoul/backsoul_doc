@@ -1,0 +1,45 @@
+version: "2"
+
+services:
+  main:
+    container_name: main
+    build:
+      context: ./app
+      target: development
+    volumes:
+      - ./app:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 3000:3000
+      - 9229:9229
+    command: npm run start:dev
+    env_file:
+      - .env
+    networks:
+      - db
+    depends_on:
+      - mysql
+  redis:
+    container_name: redis
+    image: redis:5
+    networks:
+      - db
+
+  mysql:
+    image: mariadb
+    container_name: backsoul_doc
+    ports:
+      - 3360:3306
+    env_file:
+      - .env
+    networks:
+      - db
+    environment: 
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql:/var/lib/mysql
+
+networks:
+  db:
+volumes:
+  mysql:
